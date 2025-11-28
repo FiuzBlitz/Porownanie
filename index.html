@@ -154,13 +154,14 @@ function showDetails(id){
 
 // --- List rendering ---
 function calcAverage(comp){
-  // weighted average difference: we'll compute plus avg and minus avg (1..5)
-  const p = comp.plus.map(x=>x.weight); const m = comp.minus.map(x=>x.weight);
-  const pa = p.length ? (p.reduce((a,b)=>a+b,0)/p.length) : 0;
-  const ma = m.length ? (m.reduce((a,b)=>a+b,0)/m.length) : 0;
-  // We'll display average as (pa - ma) + 5 to map into 0..10? Simpler: show plus avg as final score scaled to 1..5
-  // For visual in list, we'll show overall = pa (higher is better) but keep colors simple: if pa>=ma then green else red
-  return {pa, ma};
+  const p = comp.plus.map(x=>x.weight);
+  const m = comp.minus.map(x=>x.weight);
+  const pa = p.length? p.reduce((a,b)=>a+b,0)/p.length : 0;
+  const ma = m.length? m.reduce((a,b)=>a+b,0)/m.length : 0;
+  // overall score: midpoint 2.5 when equal
+  let score = ((pa - ma) / 2) + 2.5;
+  score = Math.max(0, Math.min(5, score));
+  return {pa, ma, score};
 }
 
 function renderList(){
@@ -171,13 +172,13 @@ function renderList(){
   }
   comparisons.forEach(comp=>{
     const r = calcAverage(comp);
-    const avg = (r.pa).toFixed(2);
+    const avg = (r.score).toFixed(2);
     const card = document.createElement('div'); card.className='card';
     card.onclick = ()=> showDetails(comp.id);
     const left = document.createElement('div'); left.className='card-left'; left.textContent = comp.title || 'Bez tytułu';
     const right = document.createElement('div'); right.className='card-right';
     const label = document.createElement('div'); label.className='avg-label'; label.textContent='Średnia';
-    const value = document.createElement('div'); value.className='avg-value ' + (r.pa>=r.ma? 'green':'red'); value.textContent = avg;
+    const value = document.createElement('div'); value.className='avg-value ${(function(){})()}' + (r.pa>=r.ma? 'green':'red'); value.textContent = avg;
     right.appendChild(label); right.appendChild(value);
 
     // add a small delete icon on the right (prevent click propagation)
@@ -272,3 +273,4 @@ function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt
 </script>
 </body>
 </html>
+
