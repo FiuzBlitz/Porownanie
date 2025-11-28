@@ -1,276 +1,324 @@
 <!DOCTYPE html>
-<html lang="pl" data-theme="light">
+<html lang="pl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Porównania — Plusy i Minusy</title>
-  <style>
-    :root{
-      --bg:#f6f7fb; --card:#fff; --text:#0b1220; --muted:#6b7280; --accent:#0ea5a4;
-      --plus:#16a34a; --minus:#ef4444; --fab:#06b6d4;
-    }
-    [data-theme="dark"]{
-      --bg:#0b1220; --card:#111827; --text:#e6eef6; --muted:#9aa4b2; --accent:#2dd4bf;
-      --plus:#4ade80; --minus:#f87171; --fab:#0ea5a4;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter, system-ui, -apple-system, Arial, sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porównania – Plusy i Minusy</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: 0.3s;
+        }
 
-    /* header */
-    .app-header{position:relative;padding:18px 16px 10px;text-align:center}
-    .theme-btn{position:absolute;left:14px;top:10px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);box-shadow:0 6px 18px rgba(2,6,23,0.08), inset 0 1px 0 rgba(255,255,255,0.03);cursor:pointer}
-    .theme-btn span{font-size:18px}
-    .title-main{margin:6px 0 0;font-size:20px;font-weight:700}
+        :root {
+            --bg: #ffffff;
+            --text: #000000;
+            --card: #f2f2f2;
+        }
 
-    /* list screen */
-    #screenList{padding:12px 14px 110px}
-    .list-grid{display:flex;flex-direction:column;gap:14px}
-    .card{background:var(--card);border-radius:18px;padding:16px 16px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(2,6,23,0.06);transition:transform .18s ease, box-shadow .18s ease;cursor:pointer}
-    .card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(2,6,23,0.12)}
-    .card-left{font-weight:700;font-size:18px}
-    .card-right{text-align:right}
-    .avg-label{font-size:12px;color:var(--muted)}
-    .avg-value{font-size:20px;font-weight:800;margin-top:4px}
-    .avg-value.green{color:var(--plus)}
-    .avg-value.red{color:var(--minus)}
+        .dark {
+            --bg: #121212;
+            --text: #eaeaea;
+            --card: #1f1f1f;
+        }
 
-    /* floating add button */
-    .fab{position:fixed;right:18px;bottom:22px;width:72px;height:72px;border-radius:50%;background:var(--fab);display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px;box-shadow:0 18px 40px rgba(6,182,212,0.18);cursor:pointer}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            font-size: 22px;
+            background: var(--card);
+        }
 
-    /* detail screen */
-    #screenDetails{display:none;padding:12px 14px 110px}
-    .detail-card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.06);margin-bottom:12px}
-    .row{display:flex;gap:10px}
-    .col{flex:1}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    input[type=text], select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:var(--text)}
-    .small-btn{padding:8px 10px;border-radius:8px;border:none;background:#111827;color:#fff;cursor:pointer}
+        .theme-btn {
+            font-size: 28px;
+            cursor: pointer;
+        }
 
-    .items-list{margin-top:8px;display:flex;flex-direction:column;gap:8px}
-    .item-row{background:rgba(0,0,0,0.02);padding:8px;border-radius:10px;display:flex;align-items:center;justify-content:space-between}
-    .item-text{flex:1;padding-right:8px}
-    .item-actions{display:flex;gap:8px;align-items:center}
-    .icon-del{cursor:pointer}
+        .container { padding: 15px; }
+        .hidden { display: none; }
 
-    /* bottom action bar on detail */
-    .detail-actions{position:fixed;left:0;right:0;bottom:0;padding:12px;background:transparent;display:flex;gap:10px}
-    .btn-primary{flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:#042023;font-weight:700}
-    .btn-ghost{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.08);background:transparent}
+        .comparison-card {
+            background: var(--card);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
 
-    /* small screens */
-    @media(min-width:700px){
-      .card{border-radius:14px}
-      .fab{right:40px;bottom:40px}
-      #screenList{padding:26px}
-    }
+        .add-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #4caf50;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 35px;
+            border: none;
+            cursor: pointer;
+        }
 
-    /* neat transitions */
-    .fade-in{animation:fadeIn .32s ease}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  </style>
+        .section-title {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            background: var(--card);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+
+        .delete-btn {
+            background: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .score-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            padding: 10px;
+            background: #2196f3;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="app-header">
-    <div class="theme-btn" id="themeBtn" title="Zmień motyw" onclick="toggleTheme()"><span id="themeIcon">🌙</span></div>
-    <div class="title-main">Porównania</div>
-  </div>
-
-  <!-- LIST SCREEN -->
-  <div id="screenList" class="fade-in">
-    <div class="list-grid" id="listGrid"></div>
-  </div>
-
-  <!-- DETAIL / EDIT SCREEN -->
-  <div id="screenDetails" class="fade-in">
-    <div class="detail-card">
-      <label>Tytuł porównania</label>
-      <input id="detailTitle" type="text" placeholder="Wpisz tytuł..." />
+    <!-- HEADER -->
+    <div class="header">
+        <div>Porównania</div>
+        <div class="theme-btn" id="themeToggle">🌙</div>
     </div>
 
-    <div class="detail-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <strong>Plusy</strong>
-        <div style="display:flex;gap:8px">
-          <input id="plusText" type="text" placeholder="Nowy plus..." style="width:170px" />
-          <select id="plusWeight"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-          <button class="small-btn" onclick="addPlus()">Dodaj</button>
-        </div>
-      </div>
-      <div class="items-list" id="plusItems"></div>
+    <!-- STRONA GŁÓWNA -->
+    <div id="homeScreen" class="container">
+        <div id="comparisonList"></div>
+        <button class="add-btn" onclick="newComparison()">+</button>
     </div>
 
-    <div class="detail-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <strong>Minusy</strong>
-        <div style="display:flex;gap:8px">
-          <input id="minusText" type="text" placeholder="Nowy minus..." style="width:170px" />
-          <select id="minusWeight"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-          <button class="small-btn" onclick="addMinus()">Dodaj</button>
-        </div>
-      </div>
-      <div class="items-list" id="minusItems"></div>
+    <!-- EKRAN PORÓWNANIA -->
+    <div id="editScreen" class="container hidden">
+        <input id="titleInput" placeholder="Tytuł porównania">
+
+        <div class="section-title">Plusy</div>
+        <div id="plusList"></div>
+        <input id="plusText" placeholder="Dodaj plus">
+        <select id="plusWeight">
+            <option value="1">1</option><option value="2">2</option>
+            <option value="3">3</option><option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <button onclick="addPlus()">Dodaj plus</button>
+
+        <div class="section-title">Minusy</div>
+        <div id="minusList"></div>
+        <input id="minusText" placeholder="Dodaj minus">
+        <select id="minusWeight">
+            <option value="1">1</option><option value="2">2</option>
+            <option value="3">3</option><option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <button onclick="addMinus()">Dodaj minus</button>
+
+        <div id="scoreBox" class="score-box">Wynik: -</div>
+
+        <div class="back-btn" onclick="goHome()">Zapisz i wróć</div>
     </div>
-
-    <div style="height:80px"></div>
-
-    <div class="detail-actions">
-      <button class="btn-ghost" onclick="cancelDetails()">Anuluj</button>
-      <button class="btn-primary" onclick="saveComparison()">Zapisz porównanie</button>
-    </div>
-  </div>
-
-  <!-- floating add -->
-  <div class="fab" id="fab" title="Dodaj porównanie" onclick="createNew()">+</div>
 
 <script>
-// Data model: { id:string, title:string, plus: [{text,weight}], minus: [{text,weight}] }
-const STORAGE_KEY = 'pmComparisons_v1';
-let comparisons = [];
-let currentId = null; // id of opened comparison
+let comparisons = JSON.parse(localStorage.getItem("comparisons") || "[]");
+let currentId = null;
 
-// --- helpers ---
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+/* ---------------- HOME SCREEN ---------------- */
 
-function loadAll(){
-  try{ const raw = localStorage.getItem(STORAGE_KEY); comparisons = raw?JSON.parse(raw):[] }catch(e){comparisons=[]}
-}
-function saveAll(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(comparisons)) }
+function renderHome() {
+    let list = document.getElementById("comparisonList");
+    list.innerHTML = "";
 
-// --- UI switches ---
-function showList(){
-  document.getElementById('screenList').style.display='block';
-  document.getElementById('screenDetails').style.display='none';
-  document.getElementById('fab').style.display='flex';
-  renderList();
-}
-function showDetails(id){
-  currentId = id;
-  document.getElementById('screenList').style.display='none';
-  document.getElementById('screenDetails').style.display='block';
-  document.getElementById('fab').style.display='none';
-  renderDetails();
+    comparisons.forEach((c, i) => {
+        let div = document.createElement("div");
+        div.className = "comparison-card";
+        div.innerHTML = `<strong>${c.title || "Bez tytułu"}</strong><br>
+                         Wynik: ${calculateScore(c).toFixed(2)}`;
+        div.onclick = () => openComparison(i);
+        list.appendChild(div);
+    });
 }
 
-// --- List rendering ---
-function calcAverage(comp){
-  const p = comp.plus.map(x=>x.weight);
-  const m = comp.minus.map(x=>x.weight);
-  const pa = p.length? p.reduce((a,b)=>a+b,0)/p.length : 0;
-  const ma = m.length? m.reduce((a,b)=>a+b,0)/m.length : 0;
-  // overall score: midpoint 2.5 when equal
-  let score = ((pa - ma) / 2) + 2.5;
-  score = Math.max(0, Math.min(5, score));
-  return {pa, ma, score};
+function newComparison() {
+    currentId = comparisons.length;
+    comparisons.push({ title: "", plus: [], minus: [] });
+    openComparison(currentId);
 }
 
-function renderList(){
-  const grid = document.getElementById('listGrid'); grid.innerHTML='';
-  if(comparisons.length===0){
-    const empty = document.createElement('div'); empty.className='card'; empty.style.justifyContent='center'; empty.innerHTML='<div style="color:var(--muted)">Brak porównań — kliknij + aby dodać</div>';
-    grid.appendChild(empty); return;
-  }
-  comparisons.forEach(comp=>{
-    const r = calcAverage(comp);
-    const avg = (r.score).toFixed(2);
-    const card = document.createElement('div'); card.className='card';
-    card.onclick = ()=> showDetails(comp.id);
-    const left = document.createElement('div'); left.className='card-left'; left.textContent = comp.title || 'Bez tytułu';
-    const right = document.createElement('div'); right.className='card-right';
-    const label = document.createElement('div'); label.className='avg-label'; label.textContent='Średnia';
-    const value = document.createElement('div'); value.className='avg-value ${(function(){})()}' + (r.pa>=r.ma? 'green':'red'); value.textContent = avg;
-    right.appendChild(label); right.appendChild(value);
+/* ---------------- EDIT SCREEN ---------------- */
 
-    // add a small delete icon on the right (prevent click propagation)
-    const del = document.createElement('div'); del.innerHTML='🗑️'; del.style.marginLeft='12px'; del.style.cursor='pointer';
-    del.onclick = (e)=>{ e.stopPropagation(); if(confirm('Usuń porównanie?')){ deleteComparison(comp.id) } };
+function openComparison(id) {
+    currentId = id;
+    document.getElementById("homeScreen").classList.add("hidden");
+    document.getElementById("editScreen").classList.remove("hidden");
 
-    const wrapper = document.createElement('div'); wrapper.style.display='flex'; wrapper.style.alignItems='center';
-    wrapper.appendChild(right);
-    wrapper.appendChild(del);
+    let data = comparisons[id];
 
-    card.appendChild(left); card.appendChild(wrapper);
-    grid.appendChild(card);
-  });
+    document.getElementById("titleInput").value = data.title;
+
+    renderItems();
+    updateScore();
 }
 
-// --- Detail rendering ---
-function renderDetails(){
-  const comp = comparisons.find(c=>c.id===currentId) || {id:currentId||uid(), title:'', plus:[], minus:[]};
-  document.getElementById('detailTitle').value = comp.title;
-  // render lists
-  const plusItems = document.getElementById('plusItems'); plusItems.innerHTML='';
-  comp.plus.forEach((it,i)=>{
-    const row = document.createElement('div'); row.className='item-row';
-    row.innerHTML = `<div style=\"display:flex;align-items:center;gap:10px\"><div style=\"font-weight:700;color:var(--plus)\">+ </div><div class=\"item-text\">${escapeHtml(it.text)}</div></div><div class=\"item-actions\"><div style=\"font-weight:700;\">${it.weight}</div><div class=\"icon-del\" onclick=\"deletePlusItem(${i})\">❌</div></div>`;
-    plusItems.appendChild(row);
-  });
-  const minusItems = document.getElementById('minusItems'); minusItems.innerHTML='';
-  comp.minus.forEach((it,i)=>{
-    const row = document.createElement('div'); row.className='item-row';
-    row.innerHTML = `<div style=\"display:flex;align-items:center;gap:10px\"><div style=\"font-weight:700;color:var(--minus)\">- </div><div class=\"item-text\">${escapeHtml(it.text)}</div></div><div class=\"item-actions\"><div style=\"font-weight:700;\">${it.weight}</div><div class=\"icon-del\" onclick=\"deleteMinusItem(${i})\">❌</div></div>`;
-    minusItems.appendChild(row);
-  });
+function goHome() {
+    let data = comparisons[currentId];
+    data.title = document.getElementById("titleInput").value;
+
+    localStorage.setItem("comparisons", JSON.stringify(comparisons));
+
+    document.getElementById("editScreen").classList.add("hidden");
+    document.getElementById("homeScreen").classList.remove("hidden");
+
+    renderHome();
 }
 
-// --- Detail actions ---
-function createNew(){
-  const newComp = { id: uid(), title: 'Nowe porównanie', plus:[], minus:[] };
-  comparisons.unshift(newComp); saveAll(); renderList(); showDetails(newComp.id);
+/* ---------------- LISTY PLUSÓW / MINUSÓW ---------------- */
+
+function renderItems() {
+    let plusList = document.getElementById("plusList");
+    let minusList = document.getElementById("minusList");
+
+    let data = comparisons[currentId];
+
+    plusList.innerHTML = "";
+    minusList.innerHTML = "";
+
+    data.plus.forEach((item, i) => {
+        plusList.innerHTML += `
+            <div class="item-row">
+                <div>+ ${item.text} (waga: ${item.w})</div>
+                <button class="delete-btn" onclick="deletePlus(${i})">X</button>
+            </div>`;
+    });
+
+    data.minus.forEach((item, i) => {
+        minusList.innerHTML += `
+            <div class="item-row">
+                <div>- ${item.text} (waga: ${item.w})</div>
+                <button class="delete-btn" onclick="deleteMinus(${i})">X</button>
+            </div>`;
+    });
 }
 
-function addPlus(){
-  const text = document.getElementById('plusText').value.trim();
-  const weight = Number(document.getElementById('plusWeight').value);
-  if(!text) return; const comp = comparisons.find(c=>c.id===currentId);
-  comp.plus.push({text,weight}); document.getElementById('plusText').value=''; saveAll(); renderDetails();
-}
-function addMinus(){
-  const text = document.getElementById('minusText').value.trim();
-  const weight = Number(document.getElementById('minusWeight').value);
-  if(!text) return; const comp = comparisons.find(c=>c.id===currentId);
-  comp.minus.push({text,weight}); document.getElementById('minusText').value=''; saveAll(); renderDetails();
-}
+function addPlus() {
+    let text = document.getElementById("plusText").value;
+    let w = Number(document.getElementById("plusWeight").value);
 
-function deletePlusItem(index){ const comp = comparisons.find(c=>c.id===currentId); comp.plus.splice(index,1); saveAll(); renderDetails(); }
-function deleteMinusItem(index){ const comp = comparisons.find(c=>c.id===currentId); comp.minus.splice(index,1); saveAll(); renderDetails(); }
+    if (!text) return;
 
-function saveComparison(){
-  const comp = comparisons.find(c=>c.id===currentId);
-  if(!comp) return;
-  comp.title = document.getElementById('detailTitle').value.trim() || 'Bez tytułu';
-  saveAll(); showList();
+    comparisons[currentId].plus.push({ text, w });
+    document.getElementById("plusText").value = "";
+
+    renderItems();
+    updateScore();
 }
 
-function cancelDetails(){ // just go back to list without deleting changes (data auto-saved on add/delete)
-  showList();
+function addMinus() {
+    let text = document.getElementById("minusText").value;
+    let w = Number(document.getElementById("minusWeight").value);
+
+    if (!text) return;
+
+    comparisons[currentId].minus.push({ text, w });
+    document.getElementById("minusText").value = "";
+
+    renderItems();
+    updateScore();
 }
 
-function deleteComparison(id){ comparisons = comparisons.filter(c=>c.id!==id); saveAll(); renderList(); }
-
-// --- theme ---
-function toggleTheme(){
-  const html = document.documentElement; const icon = document.getElementById('themeIcon');
-  const newTheme = html.dataset.theme === 'light' ? 'dark' : 'light';
-  html.dataset.theme = newTheme; icon.textContent = newTheme === 'light' ? '🌙' : '☀️';
-  localStorage.setItem('pm_theme', newTheme);
+function deletePlus(i) {
+    comparisons[currentId].plus.splice(i, 1);
+    renderItems();
+    updateScore();
 }
-function loadTheme(){ const t = localStorage.getItem('pm_theme') || 'light'; document.documentElement.dataset.theme = t; document.getElementById('themeIcon').textContent = t === 'light' ? '🌙':'☀️'; }
 
-// utility
-function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function deleteMinus(i) {
+    comparisons[currentId].minus.splice(i, 1);
+    renderItems();
+    updateScore();
+}
 
-// --- init ---
-(function init(){ loadTheme(); loadAll(); // for demo: if empty add some sample comparisons
-  if(comparisons.length===0){
-    comparisons = [
-      { id: uid(), title: 'Kupno samochodu', plus:[{text:'Wygoda',weight:5},{text:'Status',weight:4}], minus:[{text:'Koszty',weight:2},{text:'Utrzymanie',weight:3}] },
-      { id: uid(), title: 'Zmiana pracy', plus:[{text:'Większe zarobki',weight:5}], minus:[{text:'Dojazdy',weight:2},{text:'Ryzyko',weight:1}] }
-    ]; saveAll();
-  }
-  renderList();
-})();
+/* ---------------- OBLICZANIE WYNIKU ---------------- */
+
+function calculateScore(c) {
+    let plus = c.plus.reduce((a, b) => a + b.w, 0);
+    let minus = c.minus.reduce((a, b) => a + b.w, 0);
+
+    let max = Math.max(1, plus + minus);
+    return (plus / max) * 5;
+}
+
+/* ---------------- SKALA KOLORÓW ---------------- */
+
+function getColorForScore(score) {
+    if (score <= 1) return "#ff2e2e";
+    if (score <= 2) return "#ff7a00";
+    if (score < 2.5) return "#ffd700";
+    if (score === 2.5) return "#9e9e9e"; // remis
+    if (score < 3) return "#a6ff4d";
+    if (score <= 4) return "#32cd32";
+    return "#008000";
+}
+
+function updateScore() {
+    let score = calculateScore(comparisons[currentId]);
+    let box = document.getElementById("scoreBox");
+    box.innerHTML = "Wynik: " + score.toFixed(2);
+    box.style.background = getColorForScore(score);
+}
+
+/* ---------------- MOTYW ---------------- */
+
+let isDark = false;
+
+document.getElementById("themeToggle").onclick = () => {
+    isDark = !isDark;
+    document.body.classList.toggle("dark", isDark);
+    document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
+};
+
+/* ---------------- START ---------------- */
+renderHome();
 </script>
+
 </body>
 </html>
-
