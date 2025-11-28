@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Porównania — Plusy i Minusy</title>
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#fff; --text:#0b1220; --muted:#6b7280; --accent:#0ea5a4;
+      --plus:#16a34a; --minus:#ef4444; --fab:#06b6d4;
+    }
+    [data-theme="dark"]{
+      --bg:#0b1220; --card:#111827; --text:#e6eef6; --muted:#9aa4b2; --accent:#2dd4bf;
+      --plus:#4ade80; --minus:#f87171; --fab:#0ea5a4;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, Arial, sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+    /* header */
+    .app-header{position:relative;padding:18px 16px 10px;text-align:center}
+    .theme-btn{position:absolute;left:14px;top:10px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--card);box-shadow:0 6px 18px rgba(2,6,23,0.08), inset 0 1px 0 rgba(255,255,255,0.03);cursor:pointer}
+    .theme-btn span{font-size:18px}
+    .title-main{margin:6px 0 0;font-size:20px;font-weight:700}
+
+    /* list screen */
+    #screenList{padding:12px 14px 110px}
+    .list-grid{display:flex;flex-direction:column;gap:14px}
+    .card{background:var(--card);border-radius:18px;padding:16px 16px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 6px 20px rgba(2,6,23,0.06);transition:transform .18s ease, box-shadow .18s ease;cursor:pointer}
+    .card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(2,6,23,0.12)}
+    .card-left{font-weight:700;font-size:18px}
+    .card-right{text-align:right}
+    .avg-label{font-size:12px;color:var(--muted)}
+    .avg-value{font-size:20px;font-weight:800;margin-top:4px}
+    .avg-value.green{color:var(--plus)}
+    .avg-value.red{color:var(--minus)}
+
+    /* floating add button */
+    .fab{position:fixed;right:18px;bottom:22px;width:72px;height:72px;border-radius:50%;background:var(--fab);display:flex;align-items:center;justify-content:center;color:#fff;font-size:40px;box-shadow:0 18px 40px rgba(6,182,212,0.18);cursor:pointer}
+
+    /* detail screen */
+    #screenDetails{display:none;padding:12px 14px 110px}
+    .detail-card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.06);margin-bottom:12px}
+    .row{display:flex;gap:10px}
+    .col{flex:1}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=text], select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);background:transparent;color:var(--text)}
+    .small-btn{padding:8px 10px;border-radius:8px;border:none;background:#111827;color:#fff;cursor:pointer}
+
+    .items-list{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+    .item-row{background:rgba(0,0,0,0.02);padding:8px;border-radius:10px;display:flex;align-items:center;justify-content:space-between}
+    .item-text{flex:1;padding-right:8px}
+    .item-actions{display:flex;gap:8px;align-items:center}
+    .icon-del{cursor:pointer}
+
+    /* bottom action bar on detail */
+    .detail-actions{position:fixed;left:0;right:0;bottom:0;padding:12px;background:transparent;display:flex;gap:10px}
+    .btn-primary{flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:#042023;font-weight:700}
+    .btn-ghost{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.08);background:transparent}
+
+    /* small screens */
+    @media(min-width:700px){
+      .card{border-radius:14px}
+      .fab{right:40px;bottom:40px}
+      #screenList{padding:26px}
+    }
+
+    /* neat transitions */
+    .fade-in{animation:fadeIn .32s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+
+  <div class="app-header">
+    <div class="theme-btn" id="themeBtn" title="Zmień motyw" onclick="toggleTheme()"><span id="themeIcon">🌙</span></div>
+    <div class="title-main">Porównania</div>
+  </div>
+
+  <!-- LIST SCREEN -->
+  <div id="screenList" class="fade-in">
+    <div class="list-grid" id="listGrid"></div>
+  </div>
+
+  <!-- DETAIL / EDIT SCREEN -->
+  <div id="screenDetails" class="fade-in">
+    <div class="detail-card">
+      <label>Tytuł porównania</label>
+      <input id="detailTitle" type="text" placeholder="Wpisz tytuł..." />
+    </div>
+
+    <div class="detail-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <strong>Plusy</strong>
+        <div style="display:flex;gap:8px">
+          <input id="plusText" type="text" placeholder="Nowy plus..." style="width:170px" />
+          <select id="plusWeight"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+          <button class="small-btn" onclick="addPlus()">Dodaj</button>
+        </div>
+      </div>
+      <div class="items-list" id="plusItems"></div>
+    </div>
+
+    <div class="detail-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <strong>Minusy</strong>
+        <div style="display:flex;gap:8px">
+          <input id="minusText" type="text" placeholder="Nowy minus..." style="width:170px" />
+          <select id="minusWeight"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+          <button class="small-btn" onclick="addMinus()">Dodaj</button>
+        </div>
+      </div>
+      <div class="items-list" id="minusItems"></div>
+    </div>
+
+    <div style="height:80px"></div>
+
+    <div class="detail-actions">
+      <button class="btn-ghost" onclick="cancelDetails()">Anuluj</button>
+      <button class="btn-primary" onclick="saveComparison()">Zapisz porównanie</button>
+    </div>
+  </div>
+
+  <!-- floating add -->
+  <div class="fab" id="fab" title="Dodaj porównanie" onclick="createNew()">+</div>
+
+<script>
+// Data model: { id:string, title:string, plus: [{text,weight}], minus: [{text,weight}] }
+const STORAGE_KEY = 'pmComparisons_v1';
+let comparisons = [];
+let currentId = null; // id of opened comparison
+
+// --- helpers ---
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+function loadAll(){
+  try{ const raw = localStorage.getItem(STORAGE_KEY); comparisons = raw?JSON.parse(raw):[] }catch(e){comparisons=[]}
+}
+function saveAll(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(comparisons)) }
+
+// --- UI switches ---
+function showList(){
+  document.getElementById('screenList').style.display='block';
+  document.getElementById('screenDetails').style.display='none';
+  document.getElementById('fab').style.display='flex';
+  renderList();
+}
+function showDetails(id){
+  currentId = id;
+  document.getElementById('screenList').style.display='none';
+  document.getElementById('screenDetails').style.display='block';
+  document.getElementById('fab').style.display='none';
+  renderDetails();
+}
+
+// --- List rendering ---
+function calcAverage(comp){
+  // weighted average difference: we'll compute plus avg and minus avg (1..5)
+  const p = comp.plus.map(x=>x.weight); const m = comp.minus.map(x=>x.weight);
+  const pa = p.length ? (p.reduce((a,b)=>a+b,0)/p.length) : 0;
+  const ma = m.length ? (m.reduce((a,b)=>a+b,0)/m.length) : 0;
+  // We'll display average as (pa - ma) + 5 to map into 0..10? Simpler: show plus avg as final score scaled to 1..5
+  // For visual in list, we'll show overall = pa (higher is better) but keep colors simple: if pa>=ma then green else red
+  return {pa, ma};
+}
+
+function renderList(){
+  const grid = document.getElementById('listGrid'); grid.innerHTML='';
+  if(comparisons.length===0){
+    const empty = document.createElement('div'); empty.className='card'; empty.style.justifyContent='center'; empty.innerHTML='<div style="color:var(--muted)">Brak porównań — kliknij + aby dodać</div>';
+    grid.appendChild(empty); return;
+  }
+  comparisons.forEach(comp=>{
+    const r = calcAverage(comp);
+    const avg = (r.pa).toFixed(2);
+    const card = document.createElement('div'); card.className='card';
+    card.onclick = ()=> showDetails(comp.id);
+    const left = document.createElement('div'); left.className='card-left'; left.textContent = comp.title || 'Bez tytułu';
+    const right = document.createElement('div'); right.className='card-right';
+    const label = document.createElement('div'); label.className='avg-label'; label.textContent='Średnia';
+    const value = document.createElement('div'); value.className='avg-value ' + (r.pa>=r.ma? 'green':'red'); value.textContent = avg;
+    right.appendChild(label); right.appendChild(value);
+
+    // add a small delete icon on the right (prevent click propagation)
+    const del = document.createElement('div'); del.innerHTML='🗑️'; del.style.marginLeft='12px'; del.style.cursor='pointer';
+    del.onclick = (e)=>{ e.stopPropagation(); if(confirm('Usuń porównanie?')){ deleteComparison(comp.id) } };
+
+    const wrapper = document.createElement('div'); wrapper.style.display='flex'; wrapper.style.alignItems='center';
+    wrapper.appendChild(right);
+    wrapper.appendChild(del);
+
+    card.appendChild(left); card.appendChild(wrapper);
+    grid.appendChild(card);
+  });
+}
+
+// --- Detail rendering ---
+function renderDetails(){
+  const comp = comparisons.find(c=>c.id===currentId) || {id:currentId||uid(), title:'', plus:[], minus:[]};
+  document.getElementById('detailTitle').value = comp.title;
+  // render lists
+  const plusItems = document.getElementById('plusItems'); plusItems.innerHTML='';
+  comp.plus.forEach((it,i)=>{
+    const row = document.createElement('div'); row.className='item-row';
+    row.innerHTML = `<div style=\"display:flex;align-items:center;gap:10px\"><div style=\"font-weight:700;color:var(--plus)\">+ </div><div class=\"item-text\">${escapeHtml(it.text)}</div></div><div class=\"item-actions\"><div style=\"font-weight:700;\">${it.weight}</div><div class=\"icon-del\" onclick=\"deletePlusItem(${i})\">❌</div></div>`;
+    plusItems.appendChild(row);
+  });
+  const minusItems = document.getElementById('minusItems'); minusItems.innerHTML='';
+  comp.minus.forEach((it,i)=>{
+    const row = document.createElement('div'); row.className='item-row';
+    row.innerHTML = `<div style=\"display:flex;align-items:center;gap:10px\"><div style=\"font-weight:700;color:var(--minus)\">- </div><div class=\"item-text\">${escapeHtml(it.text)}</div></div><div class=\"item-actions\"><div style=\"font-weight:700;\">${it.weight}</div><div class=\"icon-del\" onclick=\"deleteMinusItem(${i})\">❌</div></div>`;
+    minusItems.appendChild(row);
+  });
+}
+
+// --- Detail actions ---
+function createNew(){
+  const newComp = { id: uid(), title: 'Nowe porównanie', plus:[], minus:[] };
+  comparisons.unshift(newComp); saveAll(); renderList(); showDetails(newComp.id);
+}
+
+function addPlus(){
+  const text = document.getElementById('plusText').value.trim();
+  const weight = Number(document.getElementById('plusWeight').value);
+  if(!text) return; const comp = comparisons.find(c=>c.id===currentId);
+  comp.plus.push({text,weight}); document.getElementById('plusText').value=''; saveAll(); renderDetails();
+}
+function addMinus(){
+  const text = document.getElementById('minusText').value.trim();
+  const weight = Number(document.getElementById('minusWeight').value);
+  if(!text) return; const comp = comparisons.find(c=>c.id===currentId);
+  comp.minus.push({text,weight}); document.getElementById('minusText').value=''; saveAll(); renderDetails();
+}
+
+function deletePlusItem(index){ const comp = comparisons.find(c=>c.id===currentId); comp.plus.splice(index,1); saveAll(); renderDetails(); }
+function deleteMinusItem(index){ const comp = comparisons.find(c=>c.id===currentId); comp.minus.splice(index,1); saveAll(); renderDetails(); }
+
+function saveComparison(){
+  const comp = comparisons.find(c=>c.id===currentId);
+  if(!comp) return;
+  comp.title = document.getElementById('detailTitle').value.trim() || 'Bez tytułu';
+  saveAll(); showList();
+}
+
+function cancelDetails(){ // just go back to list without deleting changes (data auto-saved on add/delete)
+  showList();
+}
+
+function deleteComparison(id){ comparisons = comparisons.filter(c=>c.id!==id); saveAll(); renderList(); }
+
+// --- theme ---
+function toggleTheme(){
+  const html = document.documentElement; const icon = document.getElementById('themeIcon');
+  const newTheme = html.dataset.theme === 'light' ? 'dark' : 'light';
+  html.dataset.theme = newTheme; icon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+  localStorage.setItem('pm_theme', newTheme);
+}
+function loadTheme(){ const t = localStorage.getItem('pm_theme') || 'light'; document.documentElement.dataset.theme = t; document.getElementById('themeIcon').textContent = t === 'light' ? '🌙':'☀️'; }
+
+// utility
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+// --- init ---
+(function init(){ loadTheme(); loadAll(); // for demo: if empty add some sample comparisons
+  if(comparisons.length===0){
+    comparisons = [
+      { id: uid(), title: 'Kupno samochodu', plus:[{text:'Wygoda',weight:5},{text:'Status',weight:4}], minus:[{text:'Koszty',weight:2},{text:'Utrzymanie',weight:3}] },
+      { id: uid(), title: 'Zmiana pracy', plus:[{text:'Większe zarobki',weight:5}], minus:[{text:'Dojazdy',weight:2},{text:'Ryzyko',weight:1}] }
+    ]; saveAll();
+  }
+  renderList();
+})();
+</script>
+</body>
+</html>
